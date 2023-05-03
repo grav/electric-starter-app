@@ -5,10 +5,12 @@
         {:mvn/version "0.14.3" ; (Jetty 9) is Java 8 compatible;
          ;:mvn/version "0.17.7" ; (Jetty 10) is NOT Java 8 compatible
          :exclusions [org.slf4j/slf4j-api info.sunng/ring-jetty9-adapter-http3]} ; no need
-        org.clojure/clojure {:mvn/version "1.11.1"}
+        org.clojure/clojure {:mvn/version "1.12.0-alpha3"}
         org.clojure/clojurescript {:mvn/version "1.11.60"}
         org.clojure/tools.logging {:mvn/version "1.2.4"}
         ch.qos.logback/logback-classic {:mvn/version "1.2.11"}
+        com.github.seancorfield/next.jdbc {:mvn/version "1.3.874"}
+        org.postgresql/postgresql {:mvn/version "42.2.10"}
         ring-basic-authentication/ring-basic-authentication {:mvn/version "1.1.1"}}
  :aliases {:dev
            {:extra-deps
@@ -16,8 +18,8 @@
              thheller/shadow-cljs {:mvn/version "2.20.1"}}
             :jvm-opts
             ["-Xss2m" ; https://github.com/hyperfiddle/photon/issues/11
-             "-XX:-OmitStackTraceInFastThrow" ;; RCF
-             ]
+             "-XX:-OmitStackTraceInFastThrow"] ;; RCF
+
             :exec-fn user/main
             :exec-args {}}
            :build

@@ -26,3 +26,14 @@
   ; connect a second REPL instance to it
   ; (DO NOT REUSE JVM REPL it will fail weirdly)
   (type 1))
+
+(comment
+  (do
+    (require '[next.jdbc])
+    (let [ds (next.jdbc/get-datasource
+               {:dbtype   "postgres"
+                :dbname   "postgres"
+                :user     "postgres"
+                :password "password"})]
+      (with-open [conn (next.jdbc/get-connection ds)]
+        (next.jdbc/execute! conn ["SELECT 42"])))))
