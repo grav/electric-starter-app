@@ -16,6 +16,8 @@
 #?(:clj (defonce !state (atom 0)))
 
 #?(:clj
+   ;; Use this function for mutations,
+   ;; in order to re-run queries
    (defn execute-stmt! [conn stmt]
      (jdbc/execute! conn stmt)
      (swap! !state inc)))
