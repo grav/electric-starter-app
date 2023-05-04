@@ -8,10 +8,9 @@
 #?(:clj (defonce !conn (d/create-conn {}))) ; database on server
 (e/def db) ; injected database ref; Electric defs are always dynamic
 
-(e/defn TodoItem [id]
+(e/defn TodoItem [{:keys [db/id] :as e}]
   (e/server
-    (let [e (d/entity db id)
-          status (:task/status e)]
+    (let [status (:task/status e)]
       (e/client
         (dom/div
           (ui/checkbox
@@ -62,8 +61,8 @@
           (TodoCreate.)
           (dom/div {:class "todo-items"}
             (e/server
-              (e/for-by :db/id [{:keys [db/id]} (todo-records db)]
-                (TodoItem. id))))
+              (e/for-by :db/id [{:keys [db/id] :as e} (todo-records db)]
+                (TodoItem. e))))
           (dom/p (dom/props {:class "counter"})
             (dom/span (dom/props {:class "count"}) (dom/text (e/server (todo-count db))))
             (dom/text " items left")))))))
