@@ -34,6 +34,6 @@
                {:dbtype   "postgres"
                 :dbname   "postgres"
                 :user     "postgres"
-                :password "password"})]
+                :password "postgres"})]
       (with-open [conn (next.jdbc/get-connection ds)]
         (next.jdbc/execute! conn ["SELECT 42"])))))
