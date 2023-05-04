@@ -1,12 +1,10 @@
 (ns app.todo-list2
   (:require contrib.str
-            #?(:clj [datascript.core :as d]) ; database on server
             [hyperfiddle.electric :as e]
             [hyperfiddle.electric-dom2 :as dom]
             [hyperfiddle.electric-ui4 :as ui]
             #?(:clj [next.jdbc :as jdbc])))
 
-#?(:clj (defonce !conn (d/create-conn {}))) ; database on server
 (e/def db) ; injected database ref; Electric defs are always dynamic
 
 #?(:clj (defonce !pgconn (-> (jdbc/get-datasource {:dbtype   "postgres"
@@ -32,8 +30,6 @@
             (e/fn [v]
               (e/server
                 (execute-stmt! !pgconn ["UPDATE tasks SET active = ? WHERE id=?" (not v) id])
-                (d/transact! !conn [{:db/id id
-                                     :task/status (if v :done :active)}])
                 nil))
             (dom/props {:id id}))
           (dom/label (dom/props {:for id}) (dom/text (e/server (:task/description e)))))))))
@@ -58,21 +54,13 @@
     (InputSubmit. (e/fn [v]
                     (e/server
                       (execute-stmt! !pgconn ["INSERT INTO tasks (description, active) VALUES (?,?)" v true])
-                      (d/transact! !conn [{:task/description v
-                                           :task/status :active}])
                       nil)))))
 
-#?(:clj (defn todo-count [db]
-          #_(count
-              (d/q '[:find [?e ...] :in $ ?status
-                     :where [?e :task/status ?status]] db :active))
+#?(:clj (defn todo-count [_db]
           (:count
             (first (jdbc/execute! !pgconn ["SELECT COUNT(*) AS count FROM tasks WHERE active"])))))
 
-#?(:clj (defn todo-records [db]
-          #_(->> (d/q '[:find [(pull ?e [:db/id :task/description]) ...]
-                        :where [?e :task/status]] db)
-                 (sort-by :task/description))
+#?(:clj (defn todo-records [_db]
           (->> (jdbc/execute! !pgconn ["SELECT * FROM tasks ORDER BY description"])
                (map to-datascript-format))))
 
