@@ -13,14 +13,14 @@
                                                    :password "postgres"})
                            (jdbc/get-connection))))
 
-#?(:clj (defonce !state (atom 0)))
+#?(:clj (defonce !db-counter (atom 0)))
 
 #?(:clj
    ;; Use this function for mutations,
    ;; in order to re-run queries
    (defn execute-stmt! [conn stmt]
      (jdbc/execute! conn stmt)
-     (swap! !state inc)))
+     (swap! !db-counter inc)))
 
 (e/defn TodoItem [{:keys [db/id] :as e}]
   (e/server
@@ -68,7 +68,7 @@
 
 (e/defn Todo-list []
   (e/server
-    (binding [db (e/watch !state)]
+    (binding [db (e/watch !db-counter)]
       (e/client
         (dom/link (dom/props {:rel :stylesheet :href "/todo-list.css"}))
         (dom/h1 (dom/text "minimal todo list2"))
