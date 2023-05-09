@@ -1,5 +1,10 @@
 # electric-starter-app
 
+## PG-based version
+```
+$ psql -h localhost -U postgres -f resources/init.sql
+```
+
 ```
 $ clj -A:dev -X user/main
 

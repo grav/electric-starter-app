@@ -31,7 +31,7 @@
             (case status :active false, :done true)
             (e/fn [v]
               (e/server
-                (execute-stmt! !pgconn ["UPDATE tasks SET active = ? WHERE id=?" (not v) id])
+                (execute-stmt! !pgconn ["UPDATE tasks SET active = NOT active WHERE id=?" id])
                 nil))
             (dom/props {:id id}))
           (dom/label (dom/props {:for id}) (dom/text (e/server (:task/description e)))))))))
@@ -63,7 +63,7 @@
             (first (jdbc/execute! !pgconn ["SELECT COUNT(*) AS count FROM tasks WHERE active"])))))
 
 #?(:clj (defn todo-records [_db]
-          (->> (jdbc/execute! !pgconn ["SELECT * FROM tasks ORDER BY description"])
+          (->> (jdbc/execute! !pgconn ["SELECT * FROM tasks ORDER BY description,id"])
                (map to-datascript-format))))
 
 (e/defn Todo-list []
@@ -74,11 +74,11 @@
         (dom/h1 (dom/text "minimal todo list2"))
         (dom/p (dom/text "it's multiplayer, try two tabsies!"))
         (dom/div (dom/props {:class "todo-list"})
-                 (TodoCreate.)
-                 (dom/div {:class "todo-items"}
-                          (e/server
-                            (e/for-by :db/id [{:keys [db/id] :as e} (todo-records db)]
-                                      (TodoItem. e))))
-                 (dom/p (dom/props {:class "counter"})
-                        (dom/span (dom/props {:class "count"}) (dom/text (e/server (todo-count db))))
-                        (dom/text " items left")))))))
+          (TodoCreate.)
+          (dom/div {:class "todo-items"}
+            (e/server
+              (e/for-by :db/id [{:keys [db/id] :as e} (todo-records db)]
+                (TodoItem. e))))
+          (dom/p (dom/props {:class "counter"})
+            (dom/span (dom/props {:class "count"}) (dom/text (e/server (todo-count db))))
+            (dom/text " items left")))))))
